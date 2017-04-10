@@ -149,7 +149,7 @@ subprojects {
     }
   }
 
-  apply plugin: 'java'
+  apply plugin: 'java-library'
   sourceCompatibility = 1.8
   tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -198,7 +198,7 @@ artifactory {
         'build.name': 'sonarlint-intellij',
         'build.number': (System.getenv('BUILD_ID') ?: System.getenv('TRAVIS_BUILD_NUMBER'))
       ]
-      publishConfigs('archives')
+      publications('mavenJava')
       publishPom = true // Publish generated POM files to Artifactory (true by default)
       publishIvy = false // Publish generated Ivy descriptor files to Artifactory (true by default)
     }
@@ -206,4 +206,8 @@ artifactory {
   clientConfig.info.setBuildNumber(System.getenv('TRAVIS_BUILD_NUMBER'))
 }
 
-artifactoryPublish.mavenDescriptor = file('pom.xml')
+artifactoryPublish {
+  publish {
+  }
+  mavenDescriptor = file('pom.xml')
+}
