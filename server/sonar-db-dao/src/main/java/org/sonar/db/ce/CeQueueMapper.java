@@ -20,6 +20,7 @@
 package org.sonar.db.ce;
 
 import java.util.List;
+import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import org.apache.ibatis.annotations.Param;
@@ -45,6 +46,11 @@ public interface CeQueueMapper {
    * Select all pending tasks which execution count is greater than or equal to the specified {@code minExecutionCount}.
    */
   List<CeQueueDto> selectPendingByMinimumExecutionCount(@Param("minExecutionCount") int minExecutionCount);
+
+  /**
+   * Select all tasks whose worker UUID is not present in {@code knownWorkerUUIDs}
+   */
+  void resetTasksWithUnknownWorkerUUIDs(@Param("knownWorkerUUIDs") Set<String> knownWorkerUUIDs, @Param("updatedAt") long updatedAt);
 
   int countByStatusAndComponentUuid(@Param("status") CeQueueDto.Status status, @Nullable @Param("componentUuid") String componentUuid);
 

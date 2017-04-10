@@ -21,6 +21,7 @@ package org.sonar.db.ce;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.apache.ibatis.session.RowBounds;
 import org.sonar.api.utils.System2;
@@ -82,6 +83,10 @@ public class CeQueueDao implements Dao {
 
   public List<CeQueueDto> selectPendingByMinimumExecutionCount(DbSession dbSession, int minExecutionCount) {
     return mapper(dbSession).selectPendingByMinimumExecutionCount(minExecutionCount);
+  }
+
+  public void resetTasksWithUnknownWorkerUUIDs(DbSession dbSession, Set<String> knownWorkerUUIDs) {
+    mapper(dbSession).resetTasksWithUnknownWorkerUUIDs(knownWorkerUUIDs, system2.now());
   }
 
   public CeQueueDto insert(DbSession session, CeQueueDto dto) {
