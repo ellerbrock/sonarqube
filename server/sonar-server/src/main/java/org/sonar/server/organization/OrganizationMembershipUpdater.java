@@ -46,15 +46,6 @@ public class OrganizationMembershipUpdater {
     dbClient.userGroupDao().insert(dbSession, new UserGroupDto().setGroupId(defaultGroupId).setUserId(userDto.getId()));
   }
 
-//  public void removeMember(DbSession dbSession, OrganizationDto organizationDto, UserDto userDto) {
-//    if (!isMemberOf(dbSession, organizationDto, userDto)) {
-//      return;
-//    }
-//    int defaultGroupId = getDefaultGroupId(dbSession, organizationDto);
-//    dbClient.userGroupDao().delete(dbSession, defaultGroupId, userDto.getId());
-//    dbClient.organizationMemberDao().delete(dbSession, organizationDto.getUuid(), userDto.getId());
-//  }
-
   private boolean isMemberOf(DbSession dbSession, OrganizationDto organizationDto, UserDto userDto) {
     return dbClient.organizationMemberDao().select(dbSession, organizationDto.getUuid(), userDto.getId()).isPresent();
   }

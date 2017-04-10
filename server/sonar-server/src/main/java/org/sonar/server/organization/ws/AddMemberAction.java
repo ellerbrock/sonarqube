@@ -27,14 +27,12 @@ import org.sonar.api.server.ws.WebService.NewController;
 import org.sonar.db.DbClient;
 import org.sonar.db.DbSession;
 import org.sonar.db.organization.OrganizationDto;
-import org.sonar.db.organization.OrganizationMemberDto;
 import org.sonar.db.permission.OrganizationPermission;
 import org.sonar.db.user.UserDto;
-import org.sonar.server.exceptions.BadRequestException;
+import org.sonar.server.organization.OrganizationMembershipUpdater;
 import org.sonar.server.user.UserSession;
 import org.sonar.server.user.index.UserIndexer;
 
-import static java.lang.String.format;
 import static org.sonar.server.organization.ws.OrganizationsWsSupport.PARAM_LOGIN;
 import static org.sonar.server.organization.ws.OrganizationsWsSupport.PARAM_ORGANIZATION;
 import static org.sonar.server.ws.KeyExamples.KEY_ORG_EXAMPLE_001;
@@ -45,11 +43,13 @@ public class AddMemberAction implements OrganizationsWsAction {
   private final DbClient dbClient;
   private final UserSession userSession;
   private final UserIndexer userIndexer;
+  private final OrganizationMembershipUpdater organizationMembershipUpdater;
 
-  public AddMemberAction(DbClient dbClient, UserSession userSession, UserIndexer userIndexer) {
+  public AddMemberAction(DbClient dbClient, UserSession userSession, UserIndexer userIndexer, OrganizationMembershipUpdater organizationMembershipUpdater) {
     this.dbClient = dbClient;
     this.userSession = userSession;
     this.userIndexer = userIndexer;
+    this.organizationMembershipUpdater = organizationMembershipUpdater;
   }
 
   @Override
@@ -84,19 +84,9 @@ public class AddMemberAction implements OrganizationsWsAction {
       OrganizationDto organization = checkFoundWithOptional(dbClient.organizationDao().selectByKey(dbSession, organizationKey), "Organization '%s' is not found",
         organizationKey);
       UserDto user = checkFound(dbClient.userDao().selectByLogin(dbSession, login), "User '%s' is not found", login);
-
       userSession.checkPermission(OrganizationPermission.ADMINISTER, organization);
 
-      OrganizationMemberDto organizationMember = new OrganizationMemberDto()
-        .setOrganizationUuid(organization.getUuid())
-        .setUserId(user.getId());
-
-      dbClient.organizationMemberDao().select(dbSession, organization.getUuid(), user.getId())
-        .ifPresent(o -> {
-          throw BadRequestException.create(format("User '%s' is already a member of organization '%s'", user.getLogin(), organization.getKey()));
-        });
-
-      dbClient.organizationMemberDao().insert(dbSession, organizationMember);
+      organizationMembershipUpdater.addMember(dbSession, organization, user);
       dbSession.commit();
       userIndexer.index(user.getLogin());
     }
