@@ -31,6 +31,11 @@ public class ComponentIndexFeaturePrefixTest extends ComponentIndexTest {
   }
 
   @Test
+  public void should_find_prefix() {
+    assertResultOrder("comp", "component");
+  }
+
+  @Test
   public void should_find_exact_match() {
     assertResultOrder("component.js", "component.js");
   }

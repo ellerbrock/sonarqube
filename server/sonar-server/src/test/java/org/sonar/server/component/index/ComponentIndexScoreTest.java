@@ -19,6 +19,7 @@
  */
 package org.sonar.server.component.index;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sonar.db.component.ComponentDto;
 import org.sonar.db.component.ComponentTesting;
@@ -76,6 +77,7 @@ public class ComponentIndexScoreTest extends ComponentIndexTest {
       "index_java.js");
   }
 
+  @Ignore
   @Test
   public void scoring_long_items() {
     assertResultOrder("ThisIsAVeryLongNameToSearchForAndItExceeds15Characters.java",
@@ -83,6 +85,7 @@ public class ComponentIndexScoreTest extends ComponentIndexTest {
       "ThisIsAVeryLongNameToSearchForAndItEndsDifferently.java");
   }
 
+  @Ignore
   @Test
   public void scoring_perfect_match_dispite_case_changes() {
     assertResultOrder("sonarqube",
